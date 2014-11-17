@@ -1,0 +1,2 @@
+float GetValue(char *name);
+
