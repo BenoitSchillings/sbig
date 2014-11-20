@@ -5,6 +5,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "cam.h"
 #include <signal.h>
+#include "util.h"
 
 using namespace cv;
 using namespace std;
@@ -57,8 +58,8 @@ int main(int argc, const char* argv[])
     cam->Init();
     setup_ui();
     
-    cam->SetTemperature(-20.5);
-    cam->SetFilter(6);
+    cam->SetTemperature(GetValue( "temperature"));
+    cam->SetFilter(GetValue( "filter"));
     
     cam->StartExposure(exposure);
     

@@ -57,8 +57,8 @@ int main(int argc, const char* argv[])
     cam->Init();
     
     cam->AO(ao_x, ao_y);
-    cam->SetTemperature(-20.5);
-    cam->SetFilter(6);
+    cam->SetTemperature(GetValue( "temperature"));
+    cam->SetFilter(GetValue( "filter"));
     cam->init_guide_dark(guide_exposure);
     
     
