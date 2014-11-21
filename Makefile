@@ -4,7 +4,7 @@
 	TINY = tinyxmlerror.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o
 	MISC = util.cpp.o
 
-all: take find findguide focus 
+all: take find findguide focus filter 
 
 take: take.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
 	$(CC)  -c take.cpp -o take.cpp.o $(CFLAGS) $(OPENCV)
@@ -15,6 +15,9 @@ take: take.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp
 
 cam.cpp.o: cam.cpp cam.h
 	$(CC)  -c cam.cpp -o cam.cpp.o $(CFLAGS) $(OPENCV)
+
+util.cpp.o: util.cpp util.h
+	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
 
 
 tinystr.cpp.o: ./tiny/tinystr.cpp
@@ -30,30 +33,27 @@ tinyxmlerror.cpp.o: ./tiny/tinyxmlerror.cpp
 	$(CC)  -c ./tiny/tinyxmlerror.cpp -o tinyxmlerror.cpp.o $(CFLAGS) $(OPENCV)
 
 
-find: find.cpp cam.cpp cam.h util.cpp cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
-	$(CC)  -c find.cpp -o find.cpp.o $(CFLAGS) $(OPENCV)
-	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
 
+filter: filter.cpp util.cpp.o  tinyxml.cpp.o tinyxmlerror.cpp.o
+	$(CC)  -c filter.cpp -o filter.cpp.o $(CFLAGS) $(OPENCV)
+	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  filter.cpp.o $(TINY)  $(MISC)  -o filter  -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
+
+find: find.cpp cam.cpp cam.h util.cpp.o cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
+	$(CC)  -c find.cpp -o find.cpp.o $(CFLAGS) $(OPENCV)
 	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  find.cpp.o cam.cpp.o $(TINY)  $(MISC)  -o find  -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
 
 
-findguide: findguide.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
+findguide: findguide.cpp cam.cpp.o cam.h util.cpp.o  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
 	$(CC)  -c findguide.cpp -o findguide.cpp.o $(CFLAGS) $(OPENCV)
-	$(CC)  -c cam.cpp -o cam.cpp.o $(CFLAGS) $(OPENCV)
-	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
-
 	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  findguide.cpp.o cam.cpp.o $(TINY)  $(MISC)  -o findguide  -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
 
 
-focus: focus.cpp cam.cpp cam.h util.cpp   cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
+focus: focus.cpp cam.cpp.o cam.h util.cpp.o   cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
 	$(CC)  -c focus.cpp -o focus.cpp.o $(CFLAGS) $(OPENCV)
-	$(CC)  -c cam.cpp -o cam.cpp.o $(CFLAGS) $(OPENCV)
-	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
-
 	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  focus.cpp.o cam.cpp.o $(TINY)  $(MISC)  -o focus  -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
 
 
 
 clean:
-	-rm findguide find focus take *.cpp.o 
+	-rm findguide find focus take *.cpp.o filter
 	-rm -rf *.dSYM

@@ -17,15 +17,7 @@ Camera *cam;
 
 void setup_ui()
 {
-    /*
-     cvNamedWindow("video", 1);
-     createTrackbar("gain", "video", 0, 63, 0);
-     createTrackbar("exp", "video", 0, 256, 0);
-     createTrackbar("mult", "video", 0, 1500, 0);
-     setTrackbarPos("gain", "video", 40);
-     setTrackbarPos("exp", "video", 50);
-     */
-    
+
 }
 
 void intHandler(int dummy=0) {
@@ -42,16 +34,12 @@ int main(int argc, const char* argv[])
     
     signal(SIGINT, intHandler);
     
-    if (argc != 3) {
-        printf("find <exposure> <range>. For instance find 2 100 will find with an exposure\n");
-        printf("of 2 seconds and a range of display from (minv-30) to minv+100\n");
-        exit(0);
+    if (argc != 2) {
+        printf("find <range>. For instance find 100\n");        exit(0);
     }
     
-    exposure = atof(argv[1]);
-    range = atof(argv[2]);
-    
-    printf("%f %f\n", exposure, range);
+    exposure = GetValue("find_exposure");
+    range = atof(argv[1]);
     
     
     cam = new Camera(GetValue( "find_bin"));

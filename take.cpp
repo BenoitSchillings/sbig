@@ -41,17 +41,16 @@ int main(int argc, const char* argv[])
 
     guide_exposure = GetValue( "guide_rate");
     
-    printf("%f\n", guide_exposure);
     
     //QueryDoubleAttribute
     signal(SIGINT, intHandler);
     
     if (argc != 3) {
-        printf("take <exposure> <name>. For instance take 2 take an exposure of 2 seconds\n");
+        printf("take <name>.\n");
         exit(0);
     }
     
-    float exposure = atof(argv[1]);
+    float exposure = GetValue("exposure");
     
     cam = new Camera(1);
     cam->Init();
