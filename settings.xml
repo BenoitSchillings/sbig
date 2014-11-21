@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <guide_rate val="0.5" />
 <guide_box val="30" />
+<focus_box val="80" />
 <find_bin val="3" />
 <filter val="6" />
 <temperature val="-21" />

@@ -12,8 +12,6 @@ using namespace std;
 
 
 #define DEBUG(...) {printf(__VA_ARGS__);printf("\n");}
-#define SUB 80
-
 
 int Camera::DrvCommand(short command, void *Params, void *pResults)
 {
@@ -45,7 +43,8 @@ Camera::Camera(int bin)
     imaging = Mat(Size(image_x, image_y), CV_16UC1);
     guiding = Mat::zeros(Size(guide_x, guide_y), CV_16UC1);
     guiding_dark = Mat(Size(guide_x, guide_y), CV_16UC1);
-    imagingPart = Mat(Size(SUB * 2, SUB * 2), CV_16UC1);
+    focus_box = GetValue("focus_box");
+    imagingPart = Mat(Size(focus_box, focus_box), CV_16UC1);
     
     has_guide_dark = FALSE;
     hint_x = -1;
@@ -176,10 +175,10 @@ void Camera::StartExposurePart(float duration, int cx, int cy)
     
     params.readoutMode = binval(image_bin);
    
-    params.top = cy - SUB;
-    params.left = cx + SUB;
-    params.height = SUB * 2;
-    params.width = SUB * 2;
+    params.top = cy - focus_box/2;
+    params.left = cx + focus_box/2;
+    params.height = focus_box;
+    params.width = focus_box;
     
     params.openShutter = SC_OPEN_SHUTTER;
     
@@ -617,23 +616,23 @@ int Camera::ReadoutImagePart(int cx, int cy)
         params.ccd = IMAGING; //imaging ccd
         
         params.readoutMode = binval(image_bin);
-        params.top = cy - SUB;
-        params.left = cx - SUB;
-        params.height = SUB * 2;
-        params.width = SUB * 2;
+        params.top = cy - focus_box/2;
+        params.left = cx -  focus_box/2;
+        params.height =  focus_box;
+        params.width =  focus_box;
         
         DrvCommand(CC_START_READOUT, &params, NULL);
     }
     
     int     y;
     
-    for (y = 0; y < SUB * 2; y++) {
+    for (y = 0; y < focus_box; y++) {
         ReadoutLineParams   params;
         
         params.ccd = 0;
         params.readoutMode = 0;
-        params.pixelStart = cx - SUB;
-        params.pixelLength = SUB * 2;
+        params.pixelStart = cx -  focus_box/2;
+        params.pixelLength = focus_box;
         
         ushort *ptr;
         

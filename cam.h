@@ -40,6 +40,7 @@ class Camera {
     int     hint_y;
     float   guide_bias;
     int     guide_box_size;
+    int     focus_box;
     
 public:
     Camera(int bin);
