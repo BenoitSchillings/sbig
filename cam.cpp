@@ -41,13 +41,14 @@ Camera::Camera(int bin)
     guide_y = 480 / guide_bin;
     
     guide_box_size = (int)GetValue("guide_box") / 2;
+    star_box_size = (int)GetValue("star_box") / 2;
     
     imaging = Mat(Size(image_x, image_y), CV_16UC1);
     guiding = Mat::zeros(Size(guide_x, guide_y), CV_16UC1);
     guiding_dark = Mat(Size(guide_x, guide_y), CV_16UC1);
     focus_box = GetValue("focus_box");
     imagingPart = Mat(Size(focus_box, focus_box), CV_16UC1);
-    
+    guiding_dark.setTo(0);
     has_guide_dark = FALSE;
     hint_x = -1;
     hint_y = -1;
@@ -271,7 +272,7 @@ void Camera::ExposeGuidePart(float duration, int shutter, int y1, int y2)
 
 void    Camera::init_guide_dark(float exposure)
 {
-#define DKCOUNT 10
+#define DKCOUNT 3
     int cnt = DKCOUNT;
 
     // skip one
@@ -351,7 +352,6 @@ void Camera::CalcCentroid()
         
         hint_x = x = maxLoc.x;
         hint_y = y = maxLoc.y;
-        printf("max %d %d\n", x, y);
     }
     else {
         x = hint_x;
@@ -359,11 +359,7 @@ void Camera::CalcCentroid()
     }
     
     
-    float xsum, ysum, total;
     
-    xsum = 0;
-    ysum = 0;
-    total = 0;
     
 
     if (guide_bias == 0.0) {
@@ -374,6 +370,12 @@ void Camera::CalcCentroid()
         guide_bias = guide_bias * 9.0 + GetGuide().at<ushort>(x-guide_box_size,y-guide_box_size);
         guide_bias /= 10.0;
     }
+
+    float xsum, ysum, total;
+
+    xsum = 0;
+    ysum = 0;
+    total = 0;
     
     for (yp = (y - guide_box_size); yp <= (y + guide_box_size); yp++) {
         for (xp = (x - guide_box_size); xp <= (x + guide_box_size); xp++) {
@@ -381,7 +383,32 @@ void Camera::CalcCentroid()
             
             pix = GP(xp,yp);
             
-            pix -= (guide_bias);
+            pix -= (guide_bias + 8);
+            if (pix < 0) pix = 0;
+            xsum += (float)xp * pix;
+            ysum += (float)yp * pix;
+            total += pix;
+        }
+    }
+    xsum /= total;
+    ysum /= total;
+    
+    printf("%f %f\n", xsum, ysum);
+    
+    x = centroid_x = xsum;
+    y = centroid_y = ysum;
+    
+    xsum = 0;
+    ysum = 0;
+    total = 0;
+    
+    for (yp = (y - star_box_size); yp <= (y + star_box_size); yp++) {
+        for (xp = (x - star_box_size); xp <= (x + star_box_size); xp++) {
+            float  pix;
+            
+            pix = GP(xp,yp);
+            
+            pix -= (guide_bias + 8);
             if (pix < 0) pix = 0;
             xsum += (float)xp * pix;
             ysum += (float)yp * pix;
@@ -395,6 +422,8 @@ void Camera::CalcCentroid()
     
     centroid_x = xsum;
     centroid_y = ysum;
+
+    
 }
 
 void Camera::Save(const char *filename)
@@ -483,7 +512,7 @@ int Camera::ReadoutGuidePart(int cy0, int cy1)
         if (has_guide_dark) {
             dark = guiding_dark.ptr<ushort>(y);
             for (int x = 0; x < guide_x; x++) {
-                *ptr = (*ptr + 100) - *dark;
+                *ptr = (*ptr + 200) - *dark;
                 ptr++;dark++;
             }
         }
@@ -698,17 +727,17 @@ unsigned short Camera::DegreesCToAD(double degC)
 
 int Camera::binval(int binres)
 {
-    if (image_bin == 1) {
+    if (binres == 1) {
         return BIN11;
     }
-    if (image_bin == 2) {
+    if (binres == 2) {
         return BIN22;
     }
-    if (image_bin == 3) {
+    if (binres == 3) {
         return BIN33;
     }
     
-    if (image_bin == 9) {
+    if (binres == 9) {
         return BIN99;
     }
     return BIN11;

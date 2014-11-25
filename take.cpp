@@ -33,54 +33,54 @@ int main(int argc, const char* argv[])
     float   ao_x = 0.5;
     float   ao_y = 0.5;
     
-    float   gain_x = 0.9;
-    float   gain_y = -0.6;
-    
     float   guide_exposure = 0.1;
+    
+    int     frame = 0;
     
 
     guide_exposure = GetValue( "guide_rate");
-    printf("x1\n");
+    
     
     //QueryDoubleAttribute
     signal(SIGINT, intHandler);
     
     if (argc != 2) {
-        printf("take <name>.\n");
+        printf("take <name>\n");
         exit(0);
     }
-    printf("x1\n");
     
     float exposure = GetValue("exposure");
     
     cam = new Camera(1);
-    printf("x1\n");
+    printf("x1 %s\n", argv[1]);
    
     cam->Init();
     printf("x1\n");
    
     cam->AO(ao_x, ao_y);
     cam->SetTemperature(GetValue( "temperature"));
-    //cam->SetFilter(GetValue( "filter"));
+    cam->SetFilter(GetValue( "filter"));
     cam->init_guide_dark(guide_exposure);
     
     
     cam->StartExposure(exposure);
     cam->ExposeGuide(guide_exposure, SC_LEAVE_SHUTTER);
     cam->CalcCentroid();
-    cx = 0.5 + cam->CentroidX();
-    cy = 0.5 + cam->CentroidY();
+    cam->CalcCentroid();
+    cx = (int)cam->CentroidX() + 0.0;
+    cy = (int)cam->CentroidY() + 0.0;
     
-    float x = 0.05;
-    float y = 0.05;
+    float x = 0.5;
+    float y = 0.5;
 
-    while(1 || cam->ExposureBusy()) {
+    while(cam->ExposureBusy()) {
         char c = cvWaitKey(1);
         switch(c) {
             case 27:
                 goto END;
         }
         {
+            //PartBox
             cam->ExposeGuidePartBox(guide_exposure, SC_LEAVE_SHUTTER);
             double minv;
             double maxv;
@@ -90,23 +90,37 @@ int main(int argc, const char* argv[])
             minMaxLoc(cam->GetGuide(), &minv, &maxv, &minLoc, &maxLoc);
             minv -= 10;
             printf("%f %f\n", minv, maxv);
-            imshow("guide", (cam->GuideCrop() - minv) * 132);
+            imshow("guide", (cam->GuideCrop() - minv) * 42);
             cam->CalcCentroid();
-            
             float   error_x = cx - cam->CentroidX();
             float   error_y = cy - cam->CentroidY();
             
-            if ((error_x * error_x + error_y * error_y) < 20) {
-                
-                ao_x += gain_x * error_x / 100.0;
-                ao_y += gain_y * error_y / 100.0;
-                cam->AO(ao_x, ao_y);
+            printf("error x = %f, ao_x = %f ", error_x, ao_x);
+            printf("error y = %f, ao_y = %f\n", error_y, ao_y);
+            while (fabs(error_x) > 1.0) {
+                error_x /= 4.0;
             }
+            while (fabs(error_y) > 1.0) {
+                error_y /= 4.0;
+            }
+            
+            ao_x += (error_x / 28.0);
+            ao_y -= (error_y / 28.0);
+            
+            if (ao_x < 0.0) ao_x = 0.0;
+            if (ao_x > 1.0) ao_x = 1.0;
+            if (ao_y < 0.0) ao_y = 0.0;
+            if (ao_y > 1.0) ao_y = 1.0;
+            
+            cam->AO(ao_x, ao_y);
+            
+            
+            frame++;
         }
     }
     cam->ReadoutImage();
     imshow("cam", cam->GetImage() * 3);
-    cam->Save(argv[2]);
+    cam->Save(argv[1]);
     
 END:
     cam->Close();
