@@ -68,7 +68,8 @@ public:
     float   GP(int x, int y);
     
     void    init_guide_dark(float exposure);
-    
+    Mat     GuideCrop();
+
 
     
     float   CentroidX();

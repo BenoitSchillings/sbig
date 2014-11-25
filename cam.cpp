@@ -18,13 +18,15 @@ int Camera::DrvCommand(short command, void *Params, void *pResults)
     int result;
     
     result = SBIGUnivDrvCommand(command, Params, pResults);
-    
+    //return 0;
     if (result != 0) {
         printf("Camera error %d for command <%d>\n", result, command);
         exit(-1);
     }
     return result;
 }
+
+
 
 Camera::Camera(int bin)
 {
@@ -124,7 +126,23 @@ Mat Camera::GetImage()
 
 Mat Camera::GetGuide()
 {
+    /*
+    guiding.setTo(50);
+    guiding.at<ushort>(40, 40) = 1000;
+    guiding.at<ushort>(41, 40) = 1000;
+    guiding.at<ushort>(40, 41) = 1000;
+    guiding.at<ushort>(41, 41) = 700;
+    */
     return guiding;
+}
+
+Mat Camera::GuideCrop()
+{
+    Mat tmp;
+    
+    tmp = Mat(guiding, Rect(hint_x - guide_box_size, hint_y - guide_box_size, guide_box_size*2, guide_box_size * 2));
+    resize(tmp, tmp, Size(0, 0), 6, 6, INTER_NEAREST);
+    return tmp;
 }
 
 Mat Camera::GetImagePart()

@@ -32,8 +32,9 @@ int main(int argc, const char* argv[])
     float   range = 0;
     int     cx, cy;
     
-    signal(SIGINT, intHandler);
     
+    signal(SIGINT, intHandler);
+
     if (argc != 3) {
         printf("focus <exposure> <range>. For instance focus 2 100 will find with an exposure\n");
         printf("of 2 seconds and a range of display from (minv-30) to minv+100\n");
@@ -53,7 +54,8 @@ int main(int argc, const char* argv[])
     cam->SetFilter(GetValue( "filter"));
     
     cam->StartExposure(exposure);
-    
+    Mat zoom;
+   
     while(cam->ExposureBusy()) {
         char c = cvWaitKey(1);
         switch(c) {
@@ -69,7 +71,6 @@ int main(int argc, const char* argv[])
         Point maxLoc;
         
         
-        printf("readout\n");
         cam->ReadoutImage();
         
         Mat tmp = cam->GetImage();
@@ -80,7 +81,6 @@ int main(int argc, const char* argv[])
         minMaxLoc(destination, &minv, &maxv, &minLoc, &maxLoc );
         imshow("cam", (destination - minv) * 256.0 * (256.0/range));
        
-        printf("%d %d\n", maxLoc.x, maxLoc.y);
         cx = maxLoc.x;
         cy = maxLoc.y;
     }
@@ -109,8 +109,13 @@ int main(int argc, const char* argv[])
         
         maxv = minv + range;
         minv -= 30;
-        
-        imshow("cam", (cam->GetImagePart() - minv) * 256.0 * (256.0/range));
+        resize((cam->GetImagePart() - minv) * 256.0 * (256.0/range),
+               zoom,
+               Size(0, 0),
+               6, 6,
+               INTER_NEAREST);
+
+        imshow("cam", zoom);
         
     } while(1);
     
