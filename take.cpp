@@ -32,6 +32,8 @@ int main(int argc, const char* argv[])
     
     float   ao_x = 0.5;
     float   ao_y = 0.5;
+    float   ao_x0 = 0.0;
+    float   ao_y0 = 0.0;
     
     float   guide_exposure = 0.1;
     
@@ -67,8 +69,8 @@ int main(int argc, const char* argv[])
     cam->ExposeGuide(guide_exposure, SC_LEAVE_SHUTTER);
     cam->CalcCentroid();
     cam->CalcCentroid();
-    cx = (int)cam->CentroidX() + 0.0;
-    cy = (int)cam->CentroidY() + 0.0;
+    cx = (int)cam->CentroidX() + 0.5;
+    cy = (int)cam->CentroidY() + 0.5;
     
     float x = 0.5;
     float y = 0.5;
@@ -104,6 +106,9 @@ int main(int argc, const char* argv[])
                 error_y /= 4.0;
             }
             
+            if (fabs(error_x) < 0.12) error_x = 0;
+            if (fabs(error_y) < 0.12) error_y = 0.0;
+            
             ao_x += (error_x / 28.0);
             ao_y -= (error_y / 28.0);
             
@@ -112,8 +117,13 @@ int main(int argc, const char* argv[])
             if (ao_y < 0.0) ao_y = 0.0;
             if (ao_y > 1.0) ao_y = 1.0;
             
-            cam->AO(ao_x, ao_y);
             
+            if (ao_x0 != ao_x || ao_y0 != ao_y) {
+                cam->AO(ao_x, ao_y);
+            }
+            
+            ao_x0 = ao_x;
+            ao_y0 = ao_y;
             
             frame++;
         }

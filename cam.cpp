@@ -341,8 +341,14 @@ void Camera::CalcCentroid()
     if (hint_x < 0) {
         for (yp = guide_box_size; yp <= guide_y-guide_box_size; yp++) {
             for (xp = guide_box_size; xp <= guide_x-guide_box_size; xp++) {
-                if (GP(xp,yp) > maxv) {
-                    maxv = GP(xp,yp);
+                float   val = GP(xp,yp) +
+                               GP(xp+1, yp) +
+                               GP(xp-1, yp) +
+                               GP(xp, yp - 1) +
+                               GP(xp, yp + 1);
+                
+                if (val > maxv) {
+                    maxv = val;
                     maxLoc.x = xp;
                     maxLoc.y = yp;
                 }

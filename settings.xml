@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
-<guide_rate val="0.9" />
+<guide_rate val="0.42" />
 <guide_box val="20" />
-<star_box val="8" />
+<star_box val="12" />
 <focus_box val="80" />
 <find_bin val="9" />
 <filter val="8" />
 <temperature val="-21" />
 <exposure val="120" />
 <find_exposure val="3" />
+<flat_exposure val="120" />
 

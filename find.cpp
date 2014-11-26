@@ -70,7 +70,11 @@ int main(int argc, const char* argv[])
             
             cam->ReadoutImage();
             
-            minMaxLoc(cam->GetImage(), &minv, &maxv, &minLoc, &maxLoc );
+            Mat destination = Mat(cam->GetImage().size().width, cam->GetImage().size().height, CV_16UC1);
+            
+            cv::blur(cam->GetImage(), destination, cv::Size(4,4));
+
+            minMaxLoc(destination, &minv, &maxv, &minLoc, &maxLoc );
             maxv = minv + range;
             minv -= 30;
             
