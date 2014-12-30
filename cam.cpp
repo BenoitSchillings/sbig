@@ -128,12 +128,12 @@ Mat Camera::GetImage()
 Mat Camera::GetGuide()
 {
     /*
-    guiding.setTo(50);
-    guiding.at<ushort>(40, 40) = 1000;
-    guiding.at<ushort>(41, 40) = 1000;
-    guiding.at<ushort>(40, 41) = 1000;
-    guiding.at<ushort>(41, 41) = 700;
-    */
+     guiding.setTo(50);
+     guiding.at<ushort>(40, 40) = 1000;
+     guiding.at<ushort>(41, 40) = 1000;
+     guiding.at<ushort>(40, 41) = 1000;
+     guiding.at<ushort>(41, 41) = 700;
+     */
     return guiding;
 }
 
@@ -162,7 +162,7 @@ char Camera::ExposureBusy()
     
     
     if ((res.status & 0x03) == 2)
-        return 1;
+    return 1;
     
     return 0;
 }
@@ -177,7 +177,7 @@ char Camera::GuideBusy()
     
     
     if (((res.status>>2) & 0x03) == 2)
-        return 1;
+    return 1;
     
     return 0;
 }
@@ -193,7 +193,7 @@ void Camera::StartExposurePart(float duration, int cx, int cy)
     
     
     params.readoutMode = binval(image_bin);
-   
+    
     params.top = cy - focus_box/2;
     params.left = cx + focus_box/2;
     params.height = focus_box;
@@ -236,7 +236,7 @@ void Camera::ExposeGuidePartBox(float duration, int shutter)
 
 void Camera::ExposeGuide(float duration, int shutter)
 {
- ExposeGuidePart(duration, shutter, 0, guide_y);
+    ExposeGuidePart(duration, shutter, 0, guide_y);
 }
 
 
@@ -267,17 +267,17 @@ void Camera::ExposeGuidePart(float duration, int shutter, int y1, int y2)
     } while(GuideBusy());
     
     ReadoutGuidePart(y1, y2);
- }
+}
 
 
 void    Camera::init_guide_dark(float exposure)
 {
 #define DKCOUNT 3
     int cnt = DKCOUNT;
-
+    
     // skip one
     ExposeGuide(exposure, SC_CLOSE_SHUTTER);
-
+    
     guiding_dark.setTo(0);
     while(cnt > 0) {
         ExposeGuide(exposure, SC_CLOSE_SHUTTER);
@@ -329,6 +329,36 @@ float Camera::GP(int x, int y)
     return  GetGuide().at<ushort>(y, x);
 }
 
+
+void Camera::MaxPrivate(int *xx, int *yy)
+{
+    int     x,y;
+    Point   maxLoc;
+    int xp, yp;
+    
+    double   maxv = 0;
+    double   minv = 1e9;
+    
+    for (yp = guide_box_size; yp <= guide_y-guide_box_size; yp++) {
+        for (xp = guide_box_size; xp <= guide_x-guide_box_size; xp++) {
+            float   val = GP(xp,yp) +
+            GP(xp+1, yp) +
+            GP(xp-1, yp) +
+            GP(xp, yp - 1) +
+            GP(xp, yp + 1);
+            
+            if (val > maxv) {
+                maxv = val;
+                maxLoc.x = xp;
+                maxLoc.y = yp;
+            }
+        }
+    }
+    *xx = maxLoc.x;
+    *yy = maxLoc.y;
+}
+
+
 void Camera::CalcCentroid()
 {
     int     x,y;
@@ -342,10 +372,10 @@ void Camera::CalcCentroid()
         for (yp = guide_box_size; yp <= guide_y-guide_box_size; yp++) {
             for (xp = guide_box_size; xp <= guide_x-guide_box_size; xp++) {
                 float   val = GP(xp,yp) +
-                               GP(xp+1, yp) +
-                               GP(xp-1, yp) +
-                               GP(xp, yp - 1) +
-                               GP(xp, yp + 1);
+                GP(xp+1, yp) +
+                GP(xp-1, yp) +
+                GP(xp, yp - 1) +
+                GP(xp, yp + 1);
                 
                 if (val > maxv) {
                     maxv = val;
@@ -367,7 +397,7 @@ void Camera::CalcCentroid()
     
     
     
-
+    
     if (guide_bias == 0.0) {
         guide_bias = GetGuide().at<ushort>(x-guide_box_size,y-guide_box_size);
     }
@@ -376,9 +406,9 @@ void Camera::CalcCentroid()
         guide_bias = guide_bias * 9.0 + GetGuide().at<ushort>(x-guide_box_size,y-guide_box_size);
         guide_bias /= 10.0;
     }
-
+    
     float xsum, ysum, total;
-
+    
     xsum = 0;
     ysum = 0;
     total = 0;
@@ -399,7 +429,7 @@ void Camera::CalcCentroid()
     xsum /= total;
     ysum /= total;
     
-    printf("%f %f\n", xsum, ysum);
+    //printf("%f %f\n", xsum, ysum);
     
     x = centroid_x = xsum;
     y = centroid_y = ysum;
@@ -428,7 +458,7 @@ void Camera::CalcCentroid()
     
     centroid_x = xsum;
     centroid_y = ysum;
-
+    
     
 }
 
@@ -453,7 +483,7 @@ void Camera::Save(const char *filename)
             memcpy(&header_buf[i*80], header_line, strlen(header_line));
         }
         else
-            break;
+        break;
         i++;
     } while(i < 40);
     
@@ -552,6 +582,7 @@ void Camera::Relay(float dx, float dy)
 {
     ActivateRelayParams     params;
     
+    printf("Relay %f %f\n", dx, dy);
     params.tXPlus = 0;
     params.tXMinus = 0;
     params.tYPlus = 0;
@@ -561,7 +592,7 @@ void Camera::Relay(float dx, float dy)
         params.tXMinus = -dx * 100.0;
     }
     if (dx > 0) {
-        params.tXPlus = dy * 100.0;
+        params.tXPlus = dx * 100.0;
     }
     
     
@@ -583,7 +614,7 @@ int Camera::ReadoutImage()
         
         int result = DrvCommand(CC_END_EXPOSURE, &params, NULL);
         if (result != 0)
-            return result;
+        return result;
     }
     
     {
@@ -638,8 +669,8 @@ void Camera::DumpGuideLines(int count)
     params.readoutMode = binval(guide_bin);
     params.lineLength = count;
     DrvCommand(CC_DUMP_LINES, &params, NULL);
-
-
+    
+    
 }
 
 void Camera::DumpImageLines(int count)
@@ -721,9 +752,9 @@ unsigned short Camera::DegreesCToAD(double degC)
     
 	
 	if ( degC < -50.0 )
-		degC = -50.0;
+    degC = -50.0;
 	else if ( degC > 35.0 )
-		degC = 35.0;
+    degC = 35.0;
     
     r = R0 * exp(log(RR_CCD)*(T0 - degC)/DT_CCD);
     setpoint = (unsigned short)(MAX_AD/((RB_CCD/r) + 1.0) + 0.5);

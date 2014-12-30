@@ -70,6 +70,7 @@ public:
     
     void    init_guide_dark(float exposure);
     Mat     GuideCrop();
+    void    MaxPrivate(int *xx, int *yy);
 
 
     

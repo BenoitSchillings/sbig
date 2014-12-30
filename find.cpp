@@ -72,11 +72,11 @@ int main(int argc, const char* argv[])
             
             Mat destination = Mat(cam->GetImage().size().width, cam->GetImage().size().height, CV_16UC1);
             
-            cv::blur(cam->GetImage(), destination, cv::Size(4,4));
+            cv::blur(cam->GetImage(), destination, cv::Size(14,14));
 
             minMaxLoc(destination, &minv, &maxv, &minLoc, &maxLoc );
             maxv = minv + range;
-            minv -= 30;
+            minv += 630;
             
             imshow("cam", (cam->GetImage() - minv) * 256.0 * (256.0/range));
         }
