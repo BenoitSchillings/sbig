@@ -4,7 +4,7 @@
 	TINY = tinyxmlerror.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o
 	MISC = util.cpp.o
 
-all: take find findguide focus filter flat cal
+all: take find findguide focus filter flat cal dark
 
 take: take.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
 	$(CC)  -c take.cpp -o take.cpp.o $(CFLAGS) $(OPENCV)
@@ -27,6 +27,15 @@ flat: flat.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp
 	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
 	
 	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  flat.cpp.o cam.cpp.o $(TINY) $(MISC) -o flat -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
+
+dark: dark.cpp cam.cpp cam.h util.cpp  cam.cpp.o tinystr.cpp.o tinyxmlparser.cpp.o tinyxml.cpp.o tinyxmlerror.cpp.o
+	$(CC)  -c dark.cpp -o dark.cpp.o $(CFLAGS) $(OPENCV)
+	$(CC)  -c cam.cpp -o cam.cpp.o $(CFLAGS) $(OPENCV)	
+	$(CC)  -c util.cpp -o util.cpp.o $(CFLAGS) $(OPENCV)
+	
+	$(CC)    -DNDEBUG -Wl,-search_paths_first -Wl,-headerpad_max_install_names  dark.cpp.o cam.cpp.o $(TINY) $(MISC) -o dark -framework Cocoa  -framework SBIGUdrv -lpthread $(OPENCV) -lm
+
+
 
 cam.cpp.o: cam.cpp cam.h
 	$(CC)  -c cam.cpp -o cam.cpp.o $(CFLAGS) $(OPENCV)

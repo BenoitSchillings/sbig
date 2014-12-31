@@ -204,7 +204,25 @@ void Camera::StartExposurePart(float duration, int cx, int cy)
     DrvCommand(CC_START_EXPOSURE2, &params, NULL);
 }
 
-
+void Camera::StartDark(float duration)
+{
+    StartExposureParams2    params;
+    
+    params.exposureTime = duration * 100.0;
+    params.ccd = IMAGING; //imaging ccd
+    params.abgState = 0;
+    
+    params.readoutMode = binval(image_bin);
+    
+    params.top = 0;
+    params.left = 0;
+    params.height = image_y;
+    params.width = image_x;
+    
+    params.openShutter = SC_CLOSE_SHUTTER;
+    
+    DrvCommand(CC_START_EXPOSURE2, &params, NULL);
+}
 
 void Camera::StartExposure(float duration)
 {
@@ -285,7 +303,7 @@ void    Camera::init_guide_dark(float exposure)
         cnt--;
         printf("guide dark %d\n", cnt);
     }
-    guiding_dark = guiding_dark - 30; 
+    guiding_dark = guiding_dark - 60;
     has_guide_dark = TRUE;
 }
 
@@ -548,7 +566,7 @@ int Camera::ReadoutGuidePart(int cy0, int cy1)
         if (has_guide_dark) {
             dark = guiding_dark.ptr<ushort>(y);
             for (int x = 0; x < guide_x; x++) {
-                *ptr = (*ptr + 200) - *dark;
+                *ptr = (*ptr + 300) - *dark;
                 ptr++;dark++;
             }
         }

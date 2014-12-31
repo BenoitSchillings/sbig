@@ -15,6 +15,7 @@
 <filter val="6" />
 <temperature val="-30" />
 <exposure val="900" />
+<dark_exposure val="900" />
 <find_exposure val="6.1" />
 <flat_exposure val="3.0" />
 <mount_dx1 val="-2" />

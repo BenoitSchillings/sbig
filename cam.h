@@ -57,6 +57,7 @@ public:
     int     ReadoutGuidePart(int y1, int y2);
     void    Save(const char *filename);
     void    StartExposure(float duration);
+    void    StartDark(float duration);
     void    StartExposurePart(float duration, int cx, int cy);
     void    ExposeGuide(float duration, int shutter);
     void    ExposeGuidePart(float duration, int shutter, int y1, int y2);
