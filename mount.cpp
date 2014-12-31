@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-char *port = "/dev/cu.usbserial\0";
+char *port = "/dev/tty.usbserial";
 
 
 

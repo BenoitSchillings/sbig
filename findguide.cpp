@@ -82,7 +82,7 @@ int main(int argc, const char* argv[])
             Point maxLoc;
             
             minMaxLoc(cam->GetGuide(), &minv, &maxv, &minLoc, &maxLoc );
-            minv -= 10;
+            minv -= 120;
             imshow("guide", (cam->GetGuide() - minv)  * 256.0 * (256.0/range));
         }
     }

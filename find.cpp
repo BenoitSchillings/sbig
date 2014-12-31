@@ -76,7 +76,7 @@ int main(int argc, const char* argv[])
 
             minMaxLoc(destination, &minv, &maxv, &minLoc, &maxLoc );
             maxv = minv + range;
-            minv += 630;
+            minv += 0;
             
             imshow("cam", (cam->GetImage() - minv) * 256.0 * (256.0/range));
         }

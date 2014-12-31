@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
-<guide_rate val="0.84" />
-<guide_box val="24" />
+<guide_rate val="2.64" />
+<guide_box val="22" />
 <star_box val="14" />
 <focus_box val="80" />
 <find_bin val="9" />
-<filter_red val="1" />
+<filter_red val="3" />
 <filter_green val="2" />
 <filter_blue val="3" />
 <filter_lum val="4" />
@@ -12,9 +12,9 @@
 <filter_ha val="6" />
 <filter_o3 val="7" />
 <filter_none val="8" />
-<filter val="1" />
-<temperature val="-25" />
-<exposure val="400" />
+<filter val="6" />
+<temperature val="-30" />
+<exposure val="900" />
 <find_exposure val="6.1" />
 <flat_exposure val="3.0" />
 <mount_dx1 val="-2" />

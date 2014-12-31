@@ -285,7 +285,7 @@ void    Camera::init_guide_dark(float exposure)
         cnt--;
         printf("guide dark %d\n", cnt);
     }
-    
+    guiding_dark = guiding_dark - 30; 
     has_guide_dark = TRUE;
 }
 
@@ -454,7 +454,7 @@ void Camera::CalcCentroid()
     xsum /= total;
     ysum /= total;
     
-    printf("%f %f\n", xsum, ysum);
+    //printf("%f %f\n", xsum, ysum);
     
     centroid_x = xsum;
     centroid_y = ysum;
